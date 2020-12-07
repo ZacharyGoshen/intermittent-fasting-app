@@ -21,6 +21,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
+import ProgressCircle from './ProgressCircle';
+
 const getData = async (key) => {
   try {
     const jsonValue = await AsyncStorage.getItem(key);
@@ -113,7 +115,7 @@ const App = () => {
   }
 
   return (
-      <SafeAreaView>
+      <SafeAreaView style={ styles.mainContainer }>
           <Text style={ styles.currentFastHeader }>Current Fast</Text>
           <View style={ styles.currentFastStartTimeContainer }>
             <Text style={ styles.currentFastStartTimeText }>Started on </Text>
@@ -149,9 +151,12 @@ const App = () => {
                 onChange={ onDateTimePickerChange }
               />
           )}
-          <View>
-            
-          </View>
+          <ProgressCircle
+            backgroundThickness = { 10 }
+            circleDiameter={ 350 }  
+            foregroundThickness={ 20 }
+            percent={ 30 }
+          />
       </SafeAreaView>
   );
 };
@@ -173,6 +178,13 @@ const styles = StyleSheet.create({
   },
   currentFastTime: {
     fontSize: 40
+  },
+  mainContainer: {
+    alignItems: 'center',
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center'
   }
 });
 
