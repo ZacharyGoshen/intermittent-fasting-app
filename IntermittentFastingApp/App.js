@@ -56,17 +56,22 @@ const calculateTimeDifference = (startTime, endTime) => {
 
 const App = () => {
   const [currentFastStartTime, setCurrentFastStartTime] = useState(new Date());
+  const [isFasting, setIsFasting] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [fastLength, setFastLength] = useState(8 * 60 * 60 * 1000);
 
   const [showDateTimePicker, setShowDateTimePicker] = useState(false);
   const [dateTimePickerMode, setDateTimePickerMode] = useState('');
 
   useEffect(() => {
     getData('currentFastStartTime').then(result => {
-      setCurrentFastStartTime(new Date(result));
-      setInterval(() => {
-        setCurrentTime(new Date());
-      }, 1000);
+      if (result) {
+        setCurrentFastStartTime(new Date(result));
+        setIsFasting(true);
+        setInterval(() => {
+          setCurrentTime(new Date());
+        }, 1000);
+      }
     });
   }, []);
 
@@ -114,70 +119,95 @@ const App = () => {
     }
   }
 
+  const startFast = () => {
+    setIsFasting(true);
+    setCurrentFastStartTime(new Date());
+    storeData('currentFastStartTime', currentFastStartTime.toUTCString());
+  }
+
+  const endFast = () => {
+    setIsFasting(false);
+  }
+
   return (
+    <>
       <SafeAreaView style={ styles.mainContainer }>
-          <Text style={ styles.currentFastHeader }>Current Fast</Text>
-          <View style={ styles.currentFastStartTimeContainer }>
-            <Text style={ styles.currentFastStartTimeText }>Started on </Text>
-            <Text 
-              onPress={ () => { 
-                setDateTimePickerMode('date');
-                setShowDateTimePicker(!showDateTimePicker);
-              } }
-              style={ styles.currentFastStartTimeButton }
-            >
-              { new Date(currentFastStartTime).toLocaleDateString() }
-            </Text>
-            <Text style={ styles.currentFastStartTimeText }> at </Text>
-            <Text 
-              onPress={ () => { 
-                setDateTimePickerMode('time');
-                setShowDateTimePicker(!showDateTimePicker);
-              } }
-              style={ styles.currentFastStartTimeButton }
-            >
-              { new Date(currentFastStartTime).toLocaleTimeString() }
-            </Text>
-          </View>
-          <Text style={ styles.currentFastTime }>
-            { calculateTimeDifference(currentFastStartTime.getTime(), currentTime.getTime()) }
-          </Text>
-          { showDateTimePicker && (
-              <DateTimePicker
-                value={ currentFastStartTime }
-                mode={ dateTimePickerMode }
-                is24Hour={true}
-                display="spinner"
-                onChange={ onDateTimePickerChange }
-              />
-          )}
+        <Text>{ isFasting ? 'You\'re Fasting!' : 'You\'re Not Fasting.' }</Text>
+        { isFasting && (
           <ProgressCircle
             backgroundThickness = { 10 }
             circleDiameter={ 350 }  
             foregroundThickness={ 20 }
-            percent={ 30 }
+            percent={ Math.round(100 * ((currentTime.getTime() - currentFastStartTime.getTime()) / fastLength)) }
+            time={ calculateTimeDifference(currentFastStartTime.getTime(), currentTime.getTime()) }
           />
+        ) }
+        <Button
+          title={ isFasting ? 'End fast' : 'Start fast' }
+          onPress={ isFasting ? endFast : startFast }
+        >
+        </Button>
+        { isFasting && (
+          <View>
+            <View style={ styles.fastTimeSentence }>
+              <Text>Started on </Text>
+              <Text 
+                onPress={ () => { 
+                  setDateTimePickerMode('date');
+                  setShowDateTimePicker(!showDateTimePicker);
+                } }
+                style={ styles.fastTimeButton }
+              >
+                { currentFastStartTime.toLocaleDateString() }
+              </Text>
+              <Text> at </Text>
+              <Text 
+                onPress={ () => { 
+                  setDateTimePickerMode('time');
+                  setShowDateTimePicker(!showDateTimePicker);
+                } }
+                style={ styles.fastTimeButton }
+              >
+                { currentFastStartTime.toLocaleTimeString() }
+              </Text>
+            </View>
+            <View style={ styles.fastTimeSentence }>
+              <Text>Ends on </Text>
+              <Text>
+                { new Date(currentFastStartTime.getTime() + fastLength).toLocaleDateString() }
+              </Text>
+              <Text> at </Text>
+              <Text 
+                onPress={ () => { 
+                  setDateTimePickerMode('time');
+                  setShowDateTimePicker(!showDateTimePicker);
+                } }
+              >
+                { new Date(currentFastStartTime.getTime() + fastLength).toLocaleTimeString() }
+              </Text>
+            </View>
+          </View>
+        ) }
       </SafeAreaView>
+      { showDateTimePicker && (
+        <DateTimePicker
+          value={ currentFastStartTime }
+          mode={ dateTimePickerMode }
+          is24Hour={true}
+          display="spinner"
+          onChange={ onDateTimePickerChange }
+        />
+      ) }
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  currentFastHeader: {
-    fontSize: 40
-  },
-  currentFastStartTimeButton: {
+  fastTimeButton: {
     color: 'blue',
-    fontSize: 20
   },
-  currentFastStartTimeContainer: {
+  fastTimeSentence: {
     flexDirection: 'row',
-    fontSize: 20
-  },
-  currentFastStartTimeText: {
-    fontSize: 20
-  },
-  currentFastTime: {
-    fontSize: 40
   },
   mainContainer: {
     alignItems: 'center',

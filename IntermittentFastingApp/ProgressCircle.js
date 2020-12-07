@@ -71,6 +71,7 @@ const ProgressCircle = (props) => {
         borderRadius: foregroundThickness / 2,
         height: foregroundThickness,
         left: (circleDiameter / 2) - (foregroundThickness / 2),
+        top: 0,
         width: foregroundThickness
       } 
     }
@@ -92,7 +93,7 @@ const ProgressCircle = (props) => {
     }
   
     return (
-      <View style={ [calculateContainerStyles()] }>
+      <View style={ [styles.progressCircleContainer, calculateContainerStyles()] }>
         <View style={ [styles.progressCircleBackground, calculateBackgroundStyles()] }></View>
         <View style={ [styles.progressCircleForeground, calculateForegroundStyles()] }></View>
         <View style={ [styles.progressCircleOuterMask, calculateForegroundStyles(), calculateMaskStyles()] }></View>
@@ -100,6 +101,8 @@ const ProgressCircle = (props) => {
         <View style={ [styles.progressCircleForeground, calculateForegroundStyles(), calculateSecondForegroundStyles()] }></View>
         <View style={ [styles.progressCircleCap, calculateStartCapStyles()] }></View>
         <View style={ [styles.progressCircleCap, calculateEndCapStyles()] }></View>
+        <Text>{ `Elapsed time (${percent}%)` }</Text>
+        <Text>{ props.time }</Text>
       </View>
     );
   }
@@ -113,6 +116,11 @@ const ProgressCircle = (props) => {
     progressCircleCap: {
       backgroundColor: 'black',
       position: 'absolute'
+    },
+    progressCircleContainer: {
+      alignItems: 'center',
+      display: 'flex',
+      justifyContent: 'center'
     },
     progressCircleForeground: {
       borderBottomColor: 'transparent',
