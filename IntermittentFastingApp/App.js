@@ -51,7 +51,17 @@ const calculateTimeDifference = (startTime, endTime) => {
   const minutes = Math.floor(seconds / 60);
   seconds -= minutes * 60;
 
-  return `${hours}h ${minutes}m ${seconds}s`;
+  return `${hours}:${('0' + minutes).slice(-2)}:${('0' + seconds).slice(-2)}`;
+}
+
+const dateToShortFormat = (date) => {
+  const month = new Intl.DateTimeFormat('en', { month: 'short' }).format(date);
+  const day = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(date);
+  return `${month} ${day}`;
+}
+
+const timeToShortFormat = (time) => {
+  return new Intl.DateTimeFormat('en', { timeStyle: "short" }).format(time);
 }
 
 const App = () => {
@@ -132,59 +142,61 @@ const App = () => {
   return (
     <>
       <SafeAreaView style={ styles.mainContainer }>
-        <Text>{ isFasting ? 'You\'re Fasting!' : 'You\'re Not Fasting.' }</Text>
+        <Text style={ styles.isFastingMessage }>{
+         isFasting ? 'You\'re Fasting!' : 'You\'re Not Fasting.' }
+        </Text>
         { isFasting && (
           <ProgressCircle
             backgroundThickness = { 10 }
             circleDiameter={ 350 }  
-            foregroundThickness={ 20 }
+            foregroundThickness={ 40 }
             percent={ Math.round(100 * ((currentTime.getTime() - currentFastStartTime.getTime()) / fastLength)) }
             time={ calculateTimeDifference(currentFastStartTime.getTime(), currentTime.getTime()) }
           />
         ) }
-        <Button
-          title={ isFasting ? 'End fast' : 'Start fast' }
+        <Text
           onPress={ isFasting ? endFast : startFast }
+          style={ styles.isFastingButton }
         >
-        </Button>
+          { isFasting ? 'End fast' : 'Start fast' }
+        </Text>
         { isFasting && (
           <View>
-            <View style={ styles.fastTimeSentence }>
-              <Text>Started on </Text>
-              <Text 
-                onPress={ () => { 
-                  setDateTimePickerMode('date');
-                  setShowDateTimePicker(!showDateTimePicker);
-                } }
-                style={ styles.fastTimeButton }
-              >
-                { currentFastStartTime.toLocaleDateString() }
-              </Text>
-              <Text> at </Text>
-              <Text 
-                onPress={ () => { 
-                  setDateTimePickerMode('time');
-                  setShowDateTimePicker(!showDateTimePicker);
-                } }
-                style={ styles.fastTimeButton }
-              >
-                { currentFastStartTime.toLocaleTimeString() }
-              </Text>
-            </View>
-            <View style={ styles.fastTimeSentence }>
-              <Text>Ends on </Text>
-              <Text>
-                { new Date(currentFastStartTime.getTime() + fastLength).toLocaleDateString() }
-              </Text>
-              <Text> at </Text>
-              <Text 
-                onPress={ () => { 
-                  setDateTimePickerMode('time');
-                  setShowDateTimePicker(!showDateTimePicker);
-                } }
-              >
-                { new Date(currentFastStartTime.getTime() + fastLength).toLocaleTimeString() }
-              </Text>
+            <View style={ styles.fastTimesContainer }>
+              <View style={ styles.fastStartTimeContainer }>
+                <Text style={ styles.fastTimesHeader }>STARTED FASTING</Text>
+                <View style={ styles.fastTimesValue }>
+                  <Text 
+                    onPress={ () => { 
+                      setDateTimePickerMode('date');
+                      setShowDateTimePicker(!showDateTimePicker);
+                    } }
+                    style={ styles.fastTimeButton }
+                  >
+                    { dateToShortFormat(currentFastStartTime) + ', ' }
+                  </Text>
+                  <Text 
+                    onPress={ () => { 
+                      setDateTimePickerMode('time');
+                      setShowDateTimePicker(!showDateTimePicker);
+                    } }
+                    style={ styles.fastTimeButton }
+                  >
+                    { new Date(currentFastStartTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
+                  </Text>
+                </View>
+              </View>
+              <View style={ styles.fastEndTimeContainer }>
+                <Text style={ styles.fastTimesHeader }>FAST ENDING</Text>
+                <View style={ styles.fastTimesValue }>
+                  <Text>
+                    { dateToShortFormat(currentFastStartTime.getTime() + fastLength) + ', ' }
+                  </Text>
+                  <Text>
+                    { new Date(currentFastStartTime.getTime() + fastLength).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
+                  </Text>
+                </View>
+              </View>
             </View>
           </View>
         ) }
@@ -203,14 +215,58 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
+  fastEndTimeContainer: {    
+    alignItems: 'center',
+    display: 'flex',
+    marginLeft: 40
+  },
+  fastStartTimeContainer: {
+    alignItems: 'center',
+    display: 'flex',
+    marginRight: 40
+  },
   fastTimeButton: {
-    color: 'blue',
+    color: '#4ee7ff',
   },
   fastTimeSentence: {
     flexDirection: 'row',
   },
+  fastTimesContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  fastTimesHeader: {
+    color: 'gray',
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginBottom: 10
+  },
+  fastTimesValue: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  isFastingButton: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    color: '#4ee7ff',
+    elevation: 1,
+    fontSize: 20,
+    marginBottom: 40,
+    marginTop: 20,
+    overflow: 'hidden',
+    paddingBottom: 10,
+    paddingLeft: 40,
+    paddingRight: 40,
+    paddingTop: 10,
+  },
+  isFastingMessage: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20
+  },
   mainContainer: {
     alignItems: 'center',
+    backgroundColor: '#f0f0f0',
     display: 'flex',
     flex: 1,
     flexDirection: 'column',

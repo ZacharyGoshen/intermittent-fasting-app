@@ -101,20 +101,20 @@ const ProgressCircle = (props) => {
         <View style={ [styles.progressCircleForeground, calculateForegroundStyles(), calculateSecondForegroundStyles()] }></View>
         <View style={ [styles.progressCircleCap, calculateStartCapStyles()] }></View>
         <View style={ [styles.progressCircleCap, calculateEndCapStyles()] }></View>
-        <Text>{ `Elapsed time (${percent}%)` }</Text>
-        <Text>{ props.time }</Text>
+        <Text style={ styles.timeElapsedHeader }>{ `Elapsed time (${percent}%)` }</Text>
+        <Text style={ styles.timeElapsed }>{ props.time }</Text>
       </View>
     );
   }
 
   const styles = StyleSheet.create({
     progressCircleBackground: {
-      borderColor: 'gray',
+      borderColor: '#3e92f4',
       borderRadius: 160,
       position: 'absolute',
     },
     progressCircleCap: {
-      backgroundColor: 'black',
+      backgroundColor: '#4ee7ff',
       position: 'absolute'
     },
     progressCircleContainer: {
@@ -125,24 +125,31 @@ const ProgressCircle = (props) => {
     progressCircleForeground: {
       borderBottomColor: 'transparent',
       borderLeftColor: 'transparent',
-      borderRightColor: 'black',
-      borderTopColor: 'black',
+      borderRightColor: '#4ee7ff',
+      borderTopColor: '#4ee7ff',
       position: 'absolute',
       transform: [{rotateZ: '45deg'}],
     },
     progressCircleOuterMask: {
       borderBottomColor: 'transparent',
       borderLeftColor: 'transparent',
-      borderRightColor: 'white',
-      borderTopColor: 'white',
+      borderRightColor: '#f0f0f0',
+      borderTopColor: '#f0f0f0',
       position: 'absolute',
     },
     progressCircleInnerMask: {
       borderBottomColor: 'transparent',
       borderLeftColor: 'transparent',
-      borderRightColor: 'grey',
-      borderTopColor: 'grey',
+      borderRightColor: '#3e92f4',
+      borderTopColor: '#3e92f4',
       position: 'absolute'
+    },
+    timeElapsed: {
+      fontSize: 50,
+      paddingBottom: 20
+    },
+    timeElapsedHeader: {
+      color: 'gray'
     }
   });
 
