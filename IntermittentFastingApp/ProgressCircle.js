@@ -109,7 +109,7 @@ const ProgressCircle = (props) => {
 
   const styles = StyleSheet.create({
     progressCircleBackground: {
-      borderColor: '#3e92f4',
+      borderColor: 'gray',
       borderRadius: 160,
       position: 'absolute',
     },
@@ -140,8 +140,8 @@ const ProgressCircle = (props) => {
     progressCircleInnerMask: {
       borderBottomColor: 'transparent',
       borderLeftColor: 'transparent',
-      borderRightColor: '#3e92f4',
-      borderTopColor: '#3e92f4',
+      borderRightColor: 'gray',
+      borderTopColor: 'gray',
       position: 'absolute'
     },
     timeElapsed: {

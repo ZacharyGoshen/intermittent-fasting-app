@@ -55,13 +55,27 @@ const calculateTimeDifference = (startTime, endTime) => {
 }
 
 const dateToShortFormat = (date) => {
-  const month = new Intl.DateTimeFormat('en', { month: 'short' }).format(date);
-  const day = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(date);
-  return `${month} ${day}`;
+  const yesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+  const today = new Date();
+  const tomorrow = new Date(new Date().getTime() + (24 * 60 * 60 * 1000));
+
+  if (date.getDate() == yesterday.getDate()) {
+    return 'Yesterday';
+  } else if (date.getDate() == today.getDate()) {
+    return 'Today';
+  } else if (date.getDate() == tomorrow.getDate()) {
+    return 'Tomorrow';
+  }
+  else {
+    const month = new Intl.DateTimeFormat('en', { month: 'short' }).format(date);
+    const day = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(date);
+    return `${month} ${day}`;
+  }
+
 }
 
 const timeToShortFormat = (time) => {
-  return new Intl.DateTimeFormat('en', { timeStyle: "short" }).format(time);
+  return new Intl.DateTimeFormat('en', { hour: 'numeric', minute: '2-digit' }).format(time);
 }
 
 const App = () => {
@@ -182,7 +196,7 @@ const App = () => {
                     } }
                     style={ styles.fastTimeButton }
                   >
-                    { new Date(currentFastStartTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
+                    { timeToShortFormat(currentFastStartTime) }
                   </Text>
                 </View>
               </View>
@@ -190,10 +204,10 @@ const App = () => {
                 <Text style={ styles.fastTimesHeader }>FAST ENDING</Text>
                 <View style={ styles.fastTimesValue }>
                   <Text>
-                    { dateToShortFormat(currentFastStartTime.getTime() + fastLength) + ', ' }
+                    { dateToShortFormat(new Date(currentFastStartTime.getTime() + fastLength)) + ', ' }
                   </Text>
                   <Text>
-                    { new Date(currentFastStartTime.getTime() + fastLength).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
+                    { timeToShortFormat(new Date(currentFastStartTime.getTime() + fastLength)) }
                   </Text>
                 </View>
               </View>
@@ -251,6 +265,7 @@ const styles = StyleSheet.create({
     color: '#4ee7ff',
     elevation: 1,
     fontSize: 20,
+    fontWeight: 'bold',
     marginBottom: 40,
     marginTop: 20,
     overflow: 'hidden',
