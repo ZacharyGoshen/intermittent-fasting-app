@@ -86,6 +86,7 @@ const App = () => {
 
   const [showDateTimePicker, setShowDateTimePicker] = useState(false);
   const [dateTimePickerMode, setDateTimePickerMode] = useState('');
+  const [dateTimePickerValue, setDateTimePickerValue] = useState(new Date());
 
   useEffect(() => {
     getData('currentFastStartTime').then(result => {
@@ -99,7 +100,7 @@ const App = () => {
     });
   }, []);
 
-  const onDateTimePickerChange = (event, value) => {
+  const onDateTimePickerChange = (value) => {
     if (dateTimePickerMode == 'date') {
       onCurrentFastStartDateChange(value);
     } else if (dateTimePickerMode == 'time') {
@@ -123,6 +124,8 @@ const App = () => {
       setCurrentFastStartTime(new Date(year, month, day, hours, minutes, seconds));
       storeData('currentFastStartTime', new Date(year, month, day, hours, minutes, seconds).toUTCString());
     }
+
+    setShowDateTimePicker(false);
   }
 
   const onCurrentFastStartTimeChange = (value) => {
@@ -141,6 +144,8 @@ const App = () => {
       setCurrentFastStartTime(new Date(year, month, day, hours, minutes, seconds));
       storeData('currentFastStartTime', new Date(year, month, day, hours, minutes, seconds).toUTCString());
     }
+
+    setShowDateTimePicker(false);
   }
 
   const startFast = () => {
@@ -155,27 +160,27 @@ const App = () => {
 
   return (
     <>
-      <SafeAreaView style={ styles.mainContainer }>
-        <Text style={ styles.isFastingMessage }>{
-         isFasting ? 'You\'re Fasting!' : 'You\'re Not Fasting.' }
-        </Text>
-        { isFasting && (
-          <ProgressCircle
-            backgroundThickness = { 10 }
-            circleDiameter={ 350 }  
-            foregroundThickness={ 40 }
-            percent={ Math.round(100 * ((currentTime.getTime() - currentFastStartTime.getTime()) / fastLength)) }
-            time={ calculateTimeDifference(currentFastStartTime.getTime(), currentTime.getTime()) }
-          />
-        ) }
-        <Text
-          onPress={ isFasting ? endFast : startFast }
-          style={ styles.isFastingButton }
-        >
-          { isFasting ? 'End fast' : 'Start fast' }
-        </Text>
-        { isFasting && (
-          <View>
+      <SafeAreaView style={ styles.safeArea }>
+        <ScrollView contentContainerStyle={ styles.mainContainer }>
+          <Text style={ styles.isFastingMessage }>{
+          isFasting ? 'You\'re Fasting!' : 'You\'re Not Fasting.' }
+          </Text>
+          { isFasting && (
+            <ProgressCircle
+              backgroundThickness = { 10 }
+              circleDiameter={ 350 }  
+              foregroundThickness={ 40 }
+              percent={ Math.round(100 * ((currentTime.getTime() - currentFastStartTime.getTime()) / fastLength)) }
+              time={ calculateTimeDifference(currentFastStartTime.getTime(), currentTime.getTime()) }
+            />
+          ) }
+          <Text
+            onPress={ isFasting ? endFast : startFast }
+            style={ styles.isFastingButton }
+          >
+            { isFasting ? 'End fast' : 'Start fast' }
+          </Text>
+          { isFasting && (
             <View style={ styles.fastTimesContainer }>
               <View style={ styles.fastStartTimeContainer }>
                 <Text style={ styles.fastTimesHeader }>STARTED FASTING</Text>
@@ -212,32 +217,75 @@ const App = () => {
                 </View>
               </View>
             </View>
+          ) }
+        </ScrollView>
+        { showDateTimePicker && (
+          <View style={ styles.dateTimePickerContainer }>
+            <DateTimePicker
+              value={ dateTimePickerValue }
+              mode={ dateTimePickerMode }
+              is24Hour={true}
+              display="spinner"
+              onChange={ (event, value) => setDateTimePickerValue(value) }
+            />
+            <View style={ styles.dateTimePickerButtons }>
+              <Text 
+                style={ styles.dateTimePickerButton }
+                onPress={ () => { 
+                  if (dateTimePickerMode == 'date') {
+                    onCurrentFastStartDateChange(dateTimePickerValue);
+                  } else if (dateTimePickerMode == 'time') {
+                    onCurrentFastStartTimeChange(dateTimePickerValue);
+                  }
+                } }
+              >
+                { 'Set ' + dateTimePickerMode[0].toUpperCase() + dateTimePickerMode.slice(1) }
+              </Text>
+              <Text 
+                style={ styles.dateTimePickerButton }
+                onPress={ () => setShowDateTimePicker(false) }
+              >
+                Cancel
+              </Text>
+            </View>
           </View>
         ) }
+        <View style={ styles.navBar }></View>
       </SafeAreaView>
-      { showDateTimePicker && (
-        <DateTimePicker
-          value={ currentFastStartTime }
-          mode={ dateTimePickerMode }
-          is24Hour={true}
-          display="spinner"
-          onChange={ onDateTimePickerChange }
-        />
-      ) }
     </>
   );
 };
 
 const styles = StyleSheet.create({
+  dateTimePickerButtons: {
+    borderColor: '#f0f0f0',
+    borderTopWidth: 2,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    left: 0,
+    right: 0
+  },
+  dateTimePickerButton: {
+    backgroundColor: 'white',
+    color: '#4ee7ff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    marginTop: 20
+  },
+  dateTimePickerContainer: {
+    backgroundColor: 'white',
+    borderColor: '#f0f0f0',
+    borderTopWidth: 2,
+  },
   fastEndTimeContainer: {    
     alignItems: 'center',
-    display: 'flex',
-    marginLeft: 40
+    display: 'flex'
   },
   fastStartTimeContainer: {
     alignItems: 'center',
-    display: 'flex',
-    marginRight: 40
+    display: 'flex'
   },
   fastTimeButton: {
     color: '#4ee7ff',
@@ -246,8 +294,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   fastTimesContainer: {
+    alignSelf: 'stretch',
     display: 'flex',
     flexDirection: 'row',
+    justifyContent: 'space-around',
   },
   fastTimesHeader: {
     color: 'gray',
@@ -261,7 +311,9 @@ const styles = StyleSheet.create({
   },
   isFastingButton: {
     backgroundColor: 'white',
+    borderColor: '#f0f0f0',
     borderRadius: 20,
+    borderWidth: 2,
     color: '#4ee7ff',
     elevation: 1,
     fontSize: 20,
@@ -281,12 +333,19 @@ const styles = StyleSheet.create({
   },
   mainContainer: {
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    display: 'flex',
     flex: 1,
-    flexDirection: 'column',
     justifyContent: 'center'
-  }
+  },
+  navBar: {
+    alignSelf: 'stretch',
+    backgroundColor: 'white',
+    borderColor: '#f0f0f0',
+    borderTopWidth: 2,
+    height: 50,
+  },
+  safeArea: {
+    flex: 1
+  },
 });
 
 export default App;

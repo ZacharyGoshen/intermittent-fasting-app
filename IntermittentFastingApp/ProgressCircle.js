@@ -53,16 +53,23 @@ const ProgressCircle = (props) => {
     }
   
     calculateSecondForegroundStyles = () => {
-      if (percent > 50) {
-        const baseDegrees = 45;
-        const rotateBy = baseDegrees + ((percent - 50) * 180 / 50);
-        return {
-          transform: [{rotateZ: rotateBy + 'deg'}]
-        }
-      } else {
+      if (percent <= 50) {
         return {
           display: 'none'
         };
+      } 
+      
+      const baseDegrees = 45;
+      let rotateBy = 0;
+
+      if (percent > 50 && percent <= 100) {
+        rotateBy = baseDegrees + ((percent - 50) * 180 / 50);
+      } else {
+        rotateBy = baseDegrees + 180;
+      }
+
+      return {
+        transform: [{rotateZ: rotateBy + 'deg'}]
       }
     }
   
@@ -77,6 +84,10 @@ const ProgressCircle = (props) => {
     }
   
     calculateEndCapStyles = () => {
+      if (percent >= 100) {
+        return calculateStartCapStyles();
+      }
+
       const center = (circleDiameter / 2) - (foregroundThickness / 2);
       const maxDisplacement = (circleDiameter - foregroundThickness) / 2;
       const radians = (2 * Math.PI * percent) / 100;
@@ -133,8 +144,8 @@ const ProgressCircle = (props) => {
     progressCircleOuterMask: {
       borderBottomColor: 'transparent',
       borderLeftColor: 'transparent',
-      borderRightColor: '#f0f0f0',
-      borderTopColor: '#f0f0f0',
+      borderRightColor: 'white',
+      borderTopColor: 'white',
       position: 'absolute',
     },
     progressCircleInnerMask: {
