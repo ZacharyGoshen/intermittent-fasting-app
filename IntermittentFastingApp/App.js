@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -6,31 +6,88 @@ import {
   Text,
 } from 'react-native';
 import Timer from './Timer';
+import Fasts from './Fasts';
+import History from './History';
+import Stats from './Stats';
+import { getData, storeData } from './Utils';
 
 const App = () => {
   const [currentView, setCurrentView] = useState('timer');
+  const [fastName, setFastName] = useState('16:8 Intermittent');
+  const [fastLength, setFastLength] = useState(8 * 60 * 60 * 1000);
+
+  useEffect(() => {
+    getData('fastName').then(result => {
+      setFastName(result);
+    });
+    getData('fastLength').then(result => {
+      setFastLength(result);
+    });
+  }, []);
+
+  const calculateNavItemStyles = (destination) => {
+    if (destination == currentView) {
+      return {
+        color: '#4ee7ff'
+      }
+    }
+    return {};
+  }
+
+  const onChangeFast = (fastName, fastHours, feedingHours) => {
+    storeData('fastName', fastName);
+    setFastName(fastName);
+
+    storeData('fastLength', fastHours * 60 * 60 * 1000);
+    setFastLength(fastHours * 60 * 60 * 1000);
+
+    setCurrentView('timer');
+  }
 
   return (
     <>
       <SafeAreaView style={ styles.safeArea }>
         { currentView == 'timer' && (
-          <Timer/>
+          <Timer 
+            onPressFastName={ () => setCurrentView('fasts') }
+            fastName={ fastName }
+            fastLength={ fastLength }
+          />
+        ) }
+        { currentView == 'fasts' && (
+          <Fasts onChangeFast={ onChangeFast }/>
+        ) }
+        { currentView == 'history' && (
+          <History/>
+        ) }        
+        { currentView == 'stats' && (
+          <Stats/>
         ) }
         <View style={ styles.navBar }>
           <Text 
-            style={ styles.navItemCurrent }
+            style={ [styles.navItem, calculateNavItemStyles('timer')] }
             onPress={ () => setCurrentView('timer') }
           >
             Timer
           </Text>
           <Text 
-            style={ styles.navItem }
+            style={ [styles.navItem, calculateNavItemStyles('fasts')] }
             onPress={ () => setCurrentView('fasts') }
           >
             Fasts
           </Text>
-          <Text style={ styles.navItem }>History</Text>
-          <Text style={ styles.navItem }>Stats</Text>
+          <Text 
+            style={ [styles.navItem, calculateNavItemStyles('history')] }
+            onPress={ () => setCurrentView('history') }
+          >
+            History
+          </Text>
+          <Text 
+            style={ [styles.navItem, calculateNavItemStyles('stats')] }
+            onPress={ () => setCurrentView('stats') }
+          >
+            Stats
+          </Text>
         </View>
       </SafeAreaView>
     </>
@@ -51,10 +108,6 @@ const styles = StyleSheet.create({
   },
   navItem: {
     color: 'gray',
-    fontWeight: 'bold'
-  },
-  navItemCurrent: {
-    color: '#4ee7ff',
     fontWeight: 'bold'
   },
   safeArea: {

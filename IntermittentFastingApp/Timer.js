@@ -3,7 +3,8 @@ import {
     Text,
     View,
     StyleSheet,
-    ScrollView
+    ScrollView,
+    TouchableOpacity
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ProgressCircle from './ProgressCircle';
@@ -15,15 +16,17 @@ import {
     timeToShortFormat
 } from './Utils'
 
-const Timer = () => {
+const Timer = (props) => {
     const [currentFastStartTime, setCurrentFastStartTime] = useState(new Date());
     const [isFasting, setIsFasting] = useState(false);
     const [currentTime, setCurrentTime] = useState(new Date());
-    const [fastLength, setFastLength] = useState(8 * 60 * 60 * 1000);
-
     const [showDateTimePicker, setShowDateTimePicker] = useState(false);
     const [dateTimePickerMode, setDateTimePickerMode] = useState('');
     const [dateTimePickerValue, setDateTimePickerValue] = useState(new Date());
+
+    const onPressFastName = props.onPressFastName;
+    const fastName = props.fastName;
+    const fastLength = props.fastLength;
 
     useEffect(() => {
         let interval = null;
@@ -111,42 +114,55 @@ const Timer = () => {
                     { isFasting ? 'You\'re Fasting!' : 'You\'re Not Fasting.' }
                 </Text>
                 { isFasting && (
-                <ProgressCircle
-                    backgroundThickness = { 10 }
-                    circleDiameter={ 350 }  
-                    foregroundThickness={ 40 }
-                    percent={ Math.round(100 * ((currentTime.getTime() - currentFastStartTime.getTime()) / fastLength)) }
-                    time={ calculateTimeDifference(currentFastStartTime.getTime(), currentTime.getTime()) }
-                />
+                    <>
+                        <TouchableOpacity 
+                            onPress={ onPressFastName }
+                            style={ styles.fastNameButton }
+                        >
+                            <Text 
+                                style={ styles.fastNameButtonText }
+                            >
+                                { fastName + ' Fast' }
+                            </Text>
+                        </TouchableOpacity>
+                        <ProgressCircle
+                            backgroundThickness = { 10 }
+                            circleDiameter={ 350 }  
+                            foregroundThickness={ 40 }
+                            percent={ Math.round(100 * ((currentTime.getTime() - currentFastStartTime.getTime()) / fastLength)) }
+                            timeElapsed={ calculateTimeDifference(currentFastStartTime.getTime(), currentTime.getTime()) }
+                            timeRemaining={ calculateTimeDifference(currentTime.getTime(), (currentFastStartTime.getTime() + fastLength)) }
+                        />
+                    </>
                 ) }
-                <Text
+                <TouchableOpacity
                     onPress={ isFasting ? endFast : startFast }
                     style={ styles.isFastingButton }
                 >
-                { isFasting ? 'End fast' : 'Start fast' }
-                </Text>
+                    <Text style={ styles.isFastingButtonText }>{ isFasting ? 'End fast' : 'Start fast' }</Text>
+                </TouchableOpacity>
                 { isFasting && (
                     <View style={ styles.fastTimesContainer }>
                         <View style={ styles.fastStartTimeContainer }>
                         <Text style={ styles.fastTimesHeader }>STARTED FASTING</Text>
                         <View style={ styles.fastTimesValue }>
                             <Text 
-                            onPress={ () => { 
-                                setDateTimePickerMode('date');
-                                setShowDateTimePicker(!showDateTimePicker);
-                            } }
-                            style={ styles.fastTimeButton }
+                                onPress={ () => { 
+                                    setDateTimePickerMode('date');
+                                    setShowDateTimePicker(!showDateTimePicker);
+                                } }
+                                style={ styles.fastTimeButton }
                             >
-                            { dateToShortFormat(currentFastStartTime) + ', ' }
+                                { dateToShortFormat(currentFastStartTime) + ', ' }
                             </Text>
                             <Text 
-                            onPress={ () => { 
-                                setDateTimePickerMode('time');
-                                setShowDateTimePicker(!showDateTimePicker);
-                            } }
-                            style={ styles.fastTimeButton }
+                                onPress={ () => { 
+                                    setDateTimePickerMode('time');
+                                    setShowDateTimePicker(!showDateTimePicker);
+                                } }
+                                style={ styles.fastTimeButton }
                             >
-                            { timeToShortFormat(currentFastStartTime) }
+                                { timeToShortFormat(currentFastStartTime) }
                             </Text>
                         </View>
                         </View>
@@ -175,22 +191,22 @@ const Timer = () => {
                     />
                     <View style={ styles.dateTimePickerButtons }>
                         <Text 
-                        style={ styles.dateTimePickerButton }
-                        onPress={ () => { 
-                            if (dateTimePickerMode == 'date') {
-                            onCurrentFastStartDateChange(dateTimePickerValue);
-                            } else if (dateTimePickerMode == 'time') {
-                            onCurrentFastStartTimeChange(dateTimePickerValue);
-                            }
-                        } }
+                            style={ styles.dateTimePickerButton }
+                            onPress={ () => { 
+                                if (dateTimePickerMode == 'date') {
+                                onCurrentFastStartDateChange(dateTimePickerValue);
+                                } else if (dateTimePickerMode == 'time') {
+                                onCurrentFastStartTimeChange(dateTimePickerValue);
+                                }
+                            } }
                         >
-                        { 'Set ' + dateTimePickerMode[0].toUpperCase() + dateTimePickerMode.slice(1) }
+                            { 'Set ' + dateTimePickerMode[0].toUpperCase() + dateTimePickerMode.slice(1) }
                         </Text>
                         <Text 
-                        style={ styles.dateTimePickerButton }
-                        onPress={ () => setShowDateTimePicker(false) }
+                            style={ styles.dateTimePickerButton }
+                            onPress={ () => setShowDateTimePicker(false) }
                         >
-                        Cancel
+                            Cancel
                         </Text>
                     </View>
                 </View>
@@ -221,6 +237,23 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderColor: '#f0f0f0',
         borderTopWidth: 2,
+    },
+    fastNameButton: {
+        backgroundColor: 'white',
+        borderColor: '#f0f0f0',
+        borderRadius: 20,
+        borderWidth: 2,
+        marginBottom: 20,
+        paddingBottom: 10,
+        paddingLeft: 40,
+        paddingRight: 40,
+        paddingTop: 10,
+        zIndex: 1
+    },
+    fastNameButtonText: {
+        color: '#4ee7ff',
+        fontSize: 20,
+        fontWeight: 'bold',
     },
     fastEndTimeContainer: {    
         alignItems: 'center',
@@ -257,17 +290,17 @@ const styles = StyleSheet.create({
         borderColor: '#f0f0f0',
         borderRadius: 20,
         borderWidth: 2,
-        color: '#4ee7ff',
-        elevation: 1,
-        fontSize: 20,
-        fontWeight: 'bold',
         marginBottom: 40,
         marginTop: 20,
-        overflow: 'hidden',
         paddingBottom: 10,
         paddingLeft: 40,
         paddingRight: 40,
         paddingTop: 10,
+    },
+    isFastingButtonText: {
+        color: '#4ee7ff',
+        fontSize: 20,
+        fontWeight: 'bold',
     },
     isFastingMessage: {
         fontSize: 20,

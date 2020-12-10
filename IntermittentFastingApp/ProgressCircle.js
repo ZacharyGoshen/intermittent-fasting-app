@@ -112,8 +112,10 @@ const ProgressCircle = (props) => {
         <View style={ [styles.progressCircleForeground, calculateForegroundStyles(), calculateSecondForegroundStyles()] }></View>
         <View style={ [styles.progressCircleCap, calculateStartCapStyles()] }></View>
         <View style={ [styles.progressCircleCap, calculateEndCapStyles()] }></View>
-        <Text style={ styles.timeElapsedHeader }>{ `Elapsed time (${percent}%)` }</Text>
-        <Text style={ styles.timeElapsed }>{ props.time }</Text>
+        <Text style={ styles.timeHeader }>{ `Elapsed time (${percent}%)` }</Text>
+        <Text style={ styles.timeElapsed }>{ props.timeElapsed }</Text>
+        <Text style={ styles.timeHeader }>{ `Remaining (${100 - percent}%)` }</Text>
+        <Text style={ styles.timeRemaining }>{ props.timeRemaining }</Text>
       </View>
     );
   }
@@ -157,10 +159,13 @@ const ProgressCircle = (props) => {
     },
     timeElapsed: {
       fontSize: 50,
-      paddingBottom: 20
+      marginBottom: 10
     },
-    timeElapsedHeader: {
+    timeHeader: {
       color: 'gray'
+    },
+    timeRemaining: {
+      marginTop: 5
     }
   });
 
