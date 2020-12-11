@@ -25,7 +25,7 @@ const Timer = (props) => {
     const [dateTimePickerValue, setDateTimePickerValue] = useState(new Date());
 
     const onPressFastName = props.onPressFastName;
-    const onUpdateFastData = props.onUpdateFastData;
+    const onAddFastData = props.onAddFastData;
     const fastName = props.fastName;
     const fastLength = props.fastLength;
 
@@ -99,7 +99,7 @@ const Timer = (props) => {
 
     const endFast = () => {
         setIsFasting(false);
-        onUpdateFastData({
+        onAddFastData({
             key: currentFastStartTime.getTime().toString(),
             name: fastName,
             duration: fastLength,

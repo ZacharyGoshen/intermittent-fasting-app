@@ -54,9 +54,17 @@ const App = () => {
     setCurrentView('timer');
   }
 
-  const updateFastData = (fast) => {
+  const addFastData = (fast) => {
     storeData('fastData', [...fastData, fast]);
     setFastData([...fastData, fast]);
+  }
+
+  const updateFastData = (fast) => {
+    const index = fastData.indexOf(fast);
+    fastData.splice(index, 1, fast);
+
+    storeData('fastData', fastData);
+    setFastData(fastData);
   }
 
   return (
@@ -64,7 +72,7 @@ const App = () => {
       <SafeAreaView style={ styles.safeArea }>
         { currentView == 'timer' && (
           <Timer 
-            onUpdateFastData={ (newFastData) => updateFastData(newFastData) }
+            onAddFastData={ (newFastData) => addFastData(newFastData) }
             onPressFastName={ () => setCurrentView('fasts') }
             fastName={ fastName }
             fastLength={ fastLength }
@@ -74,7 +82,10 @@ const App = () => {
           <Fasts onChangeFast={ onChangeFast }/>
         ) }
         { currentView == 'history' && (
-          <History fastData={ fastData }/>
+          <History 
+            onUpdateFastData={ (updatedFastData) => updateFastData(updatedFastData) }
+            fastData={ fastData }
+          />
         ) }        
         { currentView == 'stats' && (
           <Stats/>
