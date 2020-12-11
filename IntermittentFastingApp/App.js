@@ -13,13 +13,23 @@ import { getData, storeData } from './Utils';
 
 const App = () => {
   const [currentView, setCurrentView] = useState('timer');
+  const [fastData, setFastData] = useState([]);
   const [fastName, setFastName] = useState('16:8 Intermittent');
   const [fastLength, setFastLength] = useState(8 * 60 * 60 * 1000);
 
   useEffect(() => {
+    getData('fastData').then(result => {
+      if (result) {
+        setFastData(result);
+      } else {
+        storeData('fastData', []);
+      }
+    });
+
     getData('fastName').then(result => {
       setFastName(result);
     });
+
     getData('fastLength').then(result => {
       setFastLength(result);
     });
@@ -44,11 +54,17 @@ const App = () => {
     setCurrentView('timer');
   }
 
+  const updateFastData = (fast) => {
+    storeData('fastData', [...fastData, fast]);
+    setFastData([...fastData, fast]);
+  }
+
   return (
     <>
       <SafeAreaView style={ styles.safeArea }>
         { currentView == 'timer' && (
           <Timer 
+            onUpdateFastData={ (newFastData) => updateFastData(newFastData) }
             onPressFastName={ () => setCurrentView('fasts') }
             fastName={ fastName }
             fastLength={ fastLength }
@@ -58,7 +74,7 @@ const App = () => {
           <Fasts onChangeFast={ onChangeFast }/>
         ) }
         { currentView == 'history' && (
-          <History/>
+          <History fastData={ fastData }/>
         ) }        
         { currentView == 'stats' && (
           <Stats/>

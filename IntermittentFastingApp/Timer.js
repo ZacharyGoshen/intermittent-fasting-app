@@ -25,6 +25,7 @@ const Timer = (props) => {
     const [dateTimePickerValue, setDateTimePickerValue] = useState(new Date());
 
     const onPressFastName = props.onPressFastName;
+    const onUpdateFastData = props.onUpdateFastData;
     const fastName = props.fastName;
     const fastLength = props.fastLength;
 
@@ -36,26 +37,19 @@ const Timer = (props) => {
             if (result) {
                 setCurrentFastStartTime(new Date(result));
                 setIsFasting(true);
-                interval = setInterval(() => {
-                    if (mounted) {
-                        setCurrentTime(new Date());
-                    } else {
-                        clearInterval(interval);
-                    }
-                }, 1000);
             }
+
+            interval = setInterval(() => {
+                if (mounted) {
+                    setCurrentTime(new Date());
+                } else {
+                    clearInterval(interval);
+                }
+            }, 1000);
         });
 
         return () => { mounted = false };
     }, []);
-
-    const onDateTimePickerChange = (value) => {
-        if (dateTimePickerMode == 'date') {
-            onCurrentFastStartDateChange(value);
-        } else if (dateTimePickerMode == 'time') {
-            onCurrentFastStartTimeChange(value);
-        }
-    } 
 
     const onCurrentFastStartDateChange = (value) => {
          if (!value) return;
@@ -105,6 +99,14 @@ const Timer = (props) => {
 
     const endFast = () => {
         setIsFasting(false);
+        onUpdateFastData({
+            key: currentFastStartTime.getTime().toString(),
+            name: fastName,
+            duration: fastLength,
+            startTime: currentFastStartTime.toUTCString(),
+            endTime: currentTime.toUTCString()
+        });
+        storeData('currentFastStartTime', null);
     }
 
     return (
@@ -139,7 +141,7 @@ const Timer = (props) => {
                     onPress={ isFasting ? endFast : startFast }
                     style={ styles.isFastingButton }
                 >
-                    <Text style={ styles.isFastingButtonText }>{ isFasting ? 'End fast' : 'Start fast' }</Text>
+                    <Text style={ styles.isFastingButtonText }>{ isFasting ? 'End Fast' : 'Start Fast' }</Text>
                 </TouchableOpacity>
                 { isFasting && (
                     <View style={ styles.fastTimesContainer }>
