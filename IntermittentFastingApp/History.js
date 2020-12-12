@@ -21,12 +21,26 @@ const History = (props) => {
 
     const fastData = props.fastData;
 
+    const isTimeValid = (time, key) => {
+        for (let i = 0; i < fastData.length; i++) {
+            const startTime = new Date(fastData[i].startTime);
+            const endTime = new Date(fastData[i].endTime);
+            if (key != fastData[i].key && time >= startTime && time <= endTime) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     const onDateTimePickerSubmit = () => {
         const value = dateTimePickerValue;
         let fastToUpdate = fastData.filter(fast => fast.key == selectedFastKey)[0];
 
         if (!value) { 
             setShowDateTimePicker(false); 
+        } else if (!isTimeValid(value, selectedFastKey)) {
+            alert('Fast times can not overlap.');
         } else if (dateTimePickerMode == 'date') {
             const year = value.getFullYear();
             const month = value.getMonth();
@@ -41,8 +55,6 @@ const History = (props) => {
                 fastToUpdate[selectedFastProperty] = new Date(year, month, day, hours, minutes, seconds).toUTCString();
                 props.onUpdateFastData(fastToUpdate);
             }
-    
-            setShowDateTimePicker(false);
         } else if (dateTimePickerMode == 'time') {
             const year = new Date(fastToUpdate[selectedFastProperty]).getFullYear();
             const month = new Date(fastToUpdate[selectedFastProperty]).getMonth();
@@ -57,9 +69,9 @@ const History = (props) => {
                 fastToUpdate[selectedFastProperty] = new Date(year, month, day, hours, minutes, seconds).toUTCString();
                 props.onUpdateFastData(fastToUpdate);
             }
-    
-            setShowDateTimePicker(false);
         }
+
+        setShowDateTimePicker(false);
     }
 
     return (
