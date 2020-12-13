@@ -22,56 +22,100 @@ const History = (props) => {
     const fastData = props.fastData;
 
     const isTimeValid = (time, key) => {
-        for (let i = 0; i < fastData.length; i++) {
-            const startTime = new Date(fastData[i].startTime);
-            const endTime = new Date(fastData[i].endTime);
-            if (key != fastData[i].key && time >= startTime && time <= endTime) {
-                return false;
+        let selectedFastIndex = null;
+        let i = 0;
+
+        while (selectedFastIndex == null) {
+            if (fastData[i].key == key) {
+                selectedFastIndex = i;
+            } else {
+                i++;
             }
+        }
+
+        const latestPossibleStartTime = (selectedFastIndex != fastData.length - 1) ? new Date(fastData[selectedFastIndex + 1].endTime) : null;
+        const earliestPossibleEndTime = (selectedFastIndex != 0) ? new Date(fastData[selectedFastIndex - 1].startTime) : null;
+
+        if (latestPossibleStartTime && time <= latestPossibleStartTime) {
+            return false;
+        }
+
+        if (earliestPossibleEndTime && time >= earliestPossibleEndTime) {
+            return false;
         }
 
         return true;
     }
 
     const onDateTimePickerSubmit = () => {
-        const value = dateTimePickerValue;
-        let fastToUpdate = fastData.filter(fast => fast.key == selectedFastKey)[0];
+        const date = dateTimePickerValue;
+        let fast = fastData.filter(fast => fast.key == selectedFastKey)[0];
 
-        if (!value) { 
-            setShowDateTimePicker(false); 
-        } else if (!isTimeValid(value, selectedFastKey)) {
-            alert('Fast times can not overlap.');
+        if (!isTimeValid(date, selectedFastKey)) {
+            alert('You already recorded a fast during that time.');
         } else if (dateTimePickerMode == 'date') {
-            const year = value.getFullYear();
-            const month = value.getMonth();
-            const day = value.getDate();
-            const hours = new Date(fastToUpdate[selectedFastProperty]).getHours();
-            const minutes = new Date(fastToUpdate[selectedFastProperty]).getMinutes();
-            const seconds = new Date(fastToUpdate[selectedFastProperty]).getSeconds();
-    
-            if (new Date(year, month, day, hours, minutes, seconds).getTime() > new Date().getTime()) {
-                alert('Invalid starting date.');
-            } else {
-                fastToUpdate[selectedFastProperty] = new Date(year, month, day, hours, minutes, seconds).toUTCString();
-                props.onUpdateFastData(fastToUpdate);
-            }
+            onFastDateChange(fast, date);
         } else if (dateTimePickerMode == 'time') {
-            const year = new Date(fastToUpdate[selectedFastProperty]).getFullYear();
-            const month = new Date(fastToUpdate[selectedFastProperty]).getMonth();
-            const day = new Date(fastToUpdate[selectedFastProperty]).getDate();
-            const hours = value.getHours();
-            const minutes = value.getMinutes();
-            const seconds = value.getSeconds();
-    
-            if (new Date(year, month, day, hours, minutes, seconds).getTime() > new Date().getTime()) {
-                alert('Invalid starting time.');
-            } else {
-                fastToUpdate[selectedFastProperty] = new Date(year, month, day, hours, minutes, seconds).toUTCString();
-                props.onUpdateFastData(fastToUpdate);
-            }
+            onFastTimeChange(fast, date);
         }
 
         setShowDateTimePicker(false);
+    }
+
+    const onFastDateChange = (fast, newDate) => {
+        const year = newDate.getFullYear();
+        const month = newDate.getMonth();
+        const day = newDate.getDate();
+        const hours = new Date(fast[selectedFastProperty]).getHours();
+        const minutes = new Date(fast[selectedFastProperty]).getMinutes();
+        const seconds = new Date(fast[selectedFastProperty]).getSeconds();
+        const updatedDate = new Date(year, month, day, hours, minutes, seconds);
+
+        if (updatedDate > new Date()) {
+            alert('Date can not be in the future.');
+            return;
+        }
+
+        if (selectedFastProperty == 'startTime' && updatedDate > new Date(fast.endTime) ) {
+            alert('Starting date can\'t be after the ending date.');
+            return;
+        }
+
+        if (selectedFastProperty == 'endTime' && updatedDate < new Date(fast.startTime) ) {
+            alert('Ending date can\'t be before the starting date.');
+            return;
+        }
+
+        fast[selectedFastProperty] = updatedDate.toUTCString();
+        props.onUpdateFastData(fast);
+    }
+
+    const onFastTimeChange = (fast, newTime) => {
+        const year = new Date(fast[selectedFastProperty]).getFullYear();
+        const month = new Date(fast[selectedFastProperty]).getMonth();
+        const day = new Date(fast[selectedFastProperty]).getDate();
+        const hours = newTime.getHours();
+        const minutes = newTime.getMinutes();
+        const seconds = newTime.getSeconds();
+        const updatedTime = new Date(year, month, day, hours, minutes, seconds);
+
+        if (updatedTime > new Date()) {
+            alert('Time can not be in the future.');
+            return;
+        } 
+
+        if (selectedFastProperty == 'startTime' && updatedTime > new Date(fast.endTime) ) {
+            alert('Starting time can\'t be after the ending time.');
+            return;
+        }
+
+        if (selectedFastProperty == 'endTime' && updatedTime < new Date(fast.startTime) ) {
+            alert('Ending time can\'t be before the starting time.');
+            return;
+        }
+
+        fast[selectedFastProperty] = updatedTime.toUTCString();
+        props.onUpdateFastData(fast);
     }
 
     return (
