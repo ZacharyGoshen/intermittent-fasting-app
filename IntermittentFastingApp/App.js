@@ -76,6 +76,7 @@ const App = () => {
             onPressFastName={ () => setCurrentView('fasts') }
             fastName={ fastName }
             fastLength={ fastLength }
+            earliestPossibleStartTime = { fastData.length ? new Date(fastData[0].endTime) : null }
           />
         ) }
         { currentView == 'fasts' && (

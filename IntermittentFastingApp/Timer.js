@@ -28,6 +28,7 @@ const Timer = (props) => {
     const onAddFastData = props.onAddFastData;
     const fastName = props.fastName;
     const fastLength = props.fastLength;
+    const earliestPossibleStartTime = props.earliestPossibleStartTime;
 
     useEffect(() => {
         let interval = null;
@@ -52,40 +53,42 @@ const Timer = (props) => {
     }, []);
 
     const onCurrentFastStartDateChange = (value) => {
-         if (!value) return;
-
         const year = value.getFullYear();
         const month = value.getMonth();
         const day = value.getDate();
         const hours = currentFastStartTime.getHours();
         const minutes = currentFastStartTime.getMinutes();
         const seconds = currentFastStartTime.getSeconds();
+        const updatedDate = new Date(year, month, day, hours, minutes, seconds);
 
-        if (new Date(year, month, day, hours, minutes, seconds).getTime() > currentTime) {
-            alert('Invalid starting date.');
+        if (earliestPossibleStartTime && updatedDate <= earliestPossibleStartTime) {
+            alert('You already recorded a fast during that time.');
+        } else if (updatedDate.getTime() > currentTime) {
+            alert('Starting date can not be in the future.');
         } else {
-            setCurrentFastStartTime(new Date(year, month, day, hours, minutes, seconds));
-            storeData('currentFastStartTime', new Date(year, month, day, hours, minutes, seconds).toUTCString());
+            setCurrentFastStartTime(updatedDate);
+            storeData('currentFastStartTime', updatedDate.toUTCString());
         }
 
         setShowDateTimePicker(false);
     }
 
     const onCurrentFastStartTimeChange = (value) => {
-        if (!value) return;
-
         const year = currentFastStartTime.getFullYear();
         const month = currentFastStartTime.getMonth();
         const day = currentFastStartTime.getDate();
         const hours = value.getHours();
         const minutes = value.getMinutes();
         const seconds = value.getSeconds();
+        const updatedTime = new Date(year, month, day, hours, minutes, seconds);
 
-        if (new Date(year, month, day, hours, minutes, seconds).getTime() > currentTime) {
-            alert('Invalid starting time.');
+        if (earliestPossibleStartTime && updatedTime <= earliestPossibleStartTime) {
+            alert('You already recorded a fast during that time.');
+        } else if (updatedTime.getTime() > currentTime) {
+            alert('Starting time can not be in the future.');
         } else {
-            setCurrentFastStartTime(new Date(year, month, day, hours, minutes, seconds));
-            storeData('currentFastStartTime', new Date(year, month, day, hours, minutes, seconds).toUTCString());
+            setCurrentFastStartTime(updatedTime);
+            storeData('currentFastStartTime', updatedTime.toUTCString());
         }
 
         setShowDateTimePicker(false);
@@ -151,7 +154,8 @@ const Timer = (props) => {
                             <Text 
                                 onPress={ () => { 
                                     setDateTimePickerMode('date');
-                                    setShowDateTimePicker(!showDateTimePicker);
+                                    setDateTimePickerValue(currentFastStartTime);
+                                    setShowDateTimePicker(true);
                                 } }
                                 style={ styles.fastTimeButton }
                             >
@@ -160,7 +164,8 @@ const Timer = (props) => {
                             <Text 
                                 onPress={ () => { 
                                     setDateTimePickerMode('time');
-                                    setShowDateTimePicker(!showDateTimePicker);
+                                    setDateTimePickerValue(currentFastStartTime);
+                                    setShowDateTimePicker(true);
                                 } }
                                 style={ styles.fastTimeButton }
                             >

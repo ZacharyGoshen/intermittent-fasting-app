@@ -24,7 +24,7 @@ const History = (props) => {
     const isTimeValid = (time, key) => {
         let selectedFastIndex = null;
         let i = 0;
-
+    
         while (selectedFastIndex == null) {
             if (fastData[i].key == key) {
                 selectedFastIndex = i;
@@ -32,18 +32,18 @@ const History = (props) => {
                 i++;
             }
         }
-
+    
         const latestPossibleStartTime = (selectedFastIndex != fastData.length - 1) ? new Date(fastData[selectedFastIndex + 1].endTime) : null;
         const earliestPossibleEndTime = (selectedFastIndex != 0) ? new Date(fastData[selectedFastIndex - 1].startTime) : null;
-
+    
         if (latestPossibleStartTime && time <= latestPossibleStartTime) {
             return false;
         }
-
+    
         if (earliestPossibleEndTime && time >= earliestPossibleEndTime) {
             return false;
         }
-
+    
         return true;
     }
 
@@ -73,21 +73,14 @@ const History = (props) => {
 
         if (updatedDate > new Date()) {
             alert('Date can not be in the future.');
-            return;
-        }
-
-        if (selectedFastProperty == 'startTime' && updatedDate > new Date(fast.endTime) ) {
+        } else if (selectedFastProperty == 'startTime' && updatedDate > new Date(fast.endTime) ) {
             alert('Starting date can\'t be after the ending date.');
-            return;
-        }
-
-        if (selectedFastProperty == 'endTime' && updatedDate < new Date(fast.startTime) ) {
+        } else if (selectedFastProperty == 'endTime' && updatedDate < new Date(fast.startTime) ) {
             alert('Ending date can\'t be before the starting date.');
-            return;
+        } else {
+            fast[selectedFastProperty] = updatedDate.toUTCString();
+            props.onUpdateFastData(fast);
         }
-
-        fast[selectedFastProperty] = updatedDate.toUTCString();
-        props.onUpdateFastData(fast);
     }
 
     const onFastTimeChange = (fast, newTime) => {
@@ -101,21 +94,14 @@ const History = (props) => {
 
         if (updatedTime > new Date()) {
             alert('Time can not be in the future.');
-            return;
-        } 
-
-        if (selectedFastProperty == 'startTime' && updatedTime > new Date(fast.endTime) ) {
+        } else if (selectedFastProperty == 'startTime' && updatedTime > new Date(fast.endTime) ) {
             alert('Starting time can\'t be after the ending time.');
-            return;
-        }
-
-        if (selectedFastProperty == 'endTime' && updatedTime < new Date(fast.startTime) ) {
+        }  else if (selectedFastProperty == 'endTime' && updatedTime < new Date(fast.startTime) ) {
             alert('Ending time can\'t be before the starting time.');
-            return;
+        } else {
+            fast[selectedFastProperty] = updatedTime.toUTCString();
+            props.onUpdateFastData(fast);
         }
-
-        fast[selectedFastProperty] = updatedTime.toUTCString();
-        props.onUpdateFastData(fast);
     }
 
     return (
@@ -154,7 +140,7 @@ const History = (props) => {
                                                 setDateTimePickerValue(new Date(item.startTime));
                                                 setSelectedFastKey(item.key);
                                                 setSelectedFastProperty('startTime');
-                                                setShowDateTimePicker(!showDateTimePicker);
+                                                setShowDateTimePicker(true);
                                             } }
                                         >
                                             { dateToShortFormat(new Date(item.startTime)) }
@@ -167,7 +153,7 @@ const History = (props) => {
                                                 setDateTimePickerValue(new Date(item.startTime));
                                                 setSelectedFastKey(item.key);
                                                 setSelectedFastProperty('startTime');
-                                                setShowDateTimePicker(!showDateTimePicker);
+                                                setShowDateTimePicker(true);
                                             } }
                                         >
                                             { timeToShortFormat(new Date(item.startTime)) }
