@@ -15,13 +15,12 @@ import {
 } from './Utils'
 
 const History = (props) => {
+    const [fastData, setFastData] = useState(props.fastData);
     const [showDateTimePicker, setShowDateTimePicker] = useState(false);
     const [dateTimePickerMode, setDateTimePickerMode] = useState('date');
     const [dateTimePickerValue, setDateTimePickerValue] = useState(new Date());
     const [selectedFastKey, setSelectedFastKey] = useState(null);
     const [selectedFastProperty, setSelectedFastProperty] = useState(null);
-
-    const fastData = props.fastData;
 
     const isTimeValid = (time, key) => {
         let selectedFastIndex = null;
@@ -134,7 +133,10 @@ const History = (props) => {
                                 renderRightActions={ () => 
                                     <TouchableOpacity
                                         style={ styles.deleteButton }
-                                        onPress={ () => props.onDeleteFastData(item) }
+                                        onPress={ () => { 
+                                            props.onDeleteFastData(item); 
+                                            setFastData(fastData.splice(fastData.indexOf(item), 1));
+                                        } }
                                     >
                                         <Text style={ styles.deleteButtonText }>Delete</Text>
                                     </TouchableOpacity>

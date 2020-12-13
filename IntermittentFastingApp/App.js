@@ -72,7 +72,6 @@ const App = () => {
     fastData.splice(index, 1);
 
     storeData('fastData', fastData);
-    setFastData(fastData);
   }
 
   return (
