@@ -67,10 +67,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffa0ff',
     },
     fastDescription: {
-        color: 'gray'
+        color: 'white'
     },
     fastLength: {
-        color: 'gray',
+        color: 'white',
         fontWeight: 'bold',
         marginBottom: 10
     },

@@ -67,6 +67,14 @@ const App = () => {
     setFastData(fastData);
   }
 
+  const deleteFastData = (fast) => {
+    const index = fastData.indexOf(fast);
+    fastData.splice(index, 1);
+
+    storeData('fastData', fastData);
+    setFastData(fastData);
+  }
+
   return (
     <>
       <SafeAreaView style={ styles.safeArea }>
@@ -85,6 +93,7 @@ const App = () => {
         { currentView == 'history' && (
           <History 
             onUpdateFastData={ (updatedFastData) => updateFastData(updatedFastData) }
+            onDeleteFastData={ (deletedFastData) => deleteFastData(deletedFastData) }
             fastData={ fastData }
           />
         ) }        

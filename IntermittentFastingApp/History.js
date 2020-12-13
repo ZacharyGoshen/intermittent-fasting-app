@@ -3,9 +3,11 @@ import {
     Text,
     View,
     StyleSheet,
-    FlatList
+    FlatList,
+    TouchableOpacity
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { 
     calculateTimeDifference, 
     dateToShortFormat, 
@@ -104,6 +106,18 @@ const History = (props) => {
         }
     }
 
+    const calculatePercentageStyles = (percent) => {
+        if (percent >= 100) {
+            return {
+                color: '#4ee7ff'
+            }
+        } else {
+            return {
+                color: 'gray'
+            }
+        }
+    }
+
     return (
         <>
             <View style={ styles.mainContainer }>
@@ -116,79 +130,90 @@ const History = (props) => {
                             fastData.sort((a, b) => { return new Date(a.startTime) < new Date(b.startTime) }) 
                         }
                         renderItem={ ({item}) => 
-                            <View style={ styles.fastContainer }>
-                                <Text style={ styles.fastName }>{ item.name }</Text>
-                                <View style={ styles.firstRow }>
-                                    <Text style={ styles.timeFasted }>
-                                        { calculateTimeDifference(new Date(item.startTime).getTime(), new Date(item.endTime).getTime()) }
-                                    </Text>
-                                    <Text style={ styles.goalDuration }>
-                                        { 
-                                            Math.round(
-                                                100 * (new Date(item.endTime).getTime() - new Date(item.startTime).getTime()) / item.duration
-                                            ) + '%' 
-                                        }
-                                    </Text>
-                                </View>
-                                <View style={ styles.secondRow }>
-                                    <View style={ styles.flexRow }>
-                                        <Text style={ styles.grayText }>Started </Text>
-                                        <Text 
-                                            style={ styles.pressableText }
-                                            onPress={ () => { 
-                                                setDateTimePickerMode('date');
-                                                setDateTimePickerValue(new Date(item.startTime));
-                                                setSelectedFastKey(item.key);
-                                                setSelectedFastProperty('startTime');
-                                                setShowDateTimePicker(true);
-                                            } }
-                                        >
-                                            { dateToShortFormat(new Date(item.startTime)) }
+                            <Swipeable 
+                                renderRightActions={ () => 
+                                    <TouchableOpacity
+                                        style={ styles.deleteButton }
+                                        onPress={ () => props.onDeleteFastData(item) }
+                                    >
+                                        <Text style={ styles.deleteButtonText }>Delete</Text>
+                                    </TouchableOpacity>
+                                }
+                            >
+                                <View style={ styles.fastContainer } >
+                                    <Text style={ styles.fastName }>{ item.name }</Text>
+                                    <View style={ styles.firstRow }>
+                                        <Text style={ styles.timeFasted }>
+                                            { calculateTimeDifference(new Date(item.startTime).getTime(), new Date(item.endTime).getTime()) }
                                         </Text>
-                                        <Text style={ styles.grayText }> at </Text>
-                                        <Text 
-                                            style={ styles.pressableText }
-                                            onPress={ () => { 
-                                                setDateTimePickerMode('time');
-                                                setDateTimePickerValue(new Date(item.startTime));
-                                                setSelectedFastKey(item.key);
-                                                setSelectedFastProperty('startTime');
-                                                setShowDateTimePicker(true);
-                                            } }
-                                        >
-                                            { timeToShortFormat(new Date(item.startTime)) }
+                                        <Text style={ [styles.percentage, calculatePercentageStyles(100 * (new Date(item.endTime).getTime() - new Date(item.startTime).getTime()) / item.duration)] }>
+                                            { 
+                                                Math.round(
+                                                    100 * (new Date(item.endTime).getTime() - new Date(item.startTime).getTime()) / item.duration
+                                                ) + '%' 
+                                            }
                                         </Text>
                                     </View>
-                                    <View style={ styles.flexRow }>
-                                        <Text style={ styles.grayText }>Ended </Text>
-                                        <Text 
-                                            style={ styles.pressableText }
-                                            onPress={ () => { 
-                                                setDateTimePickerMode('date');
-                                                setDateTimePickerValue(new Date(item.endTime));
-                                                setSelectedFastKey(item.key);
-                                                setSelectedFastProperty('endTime');
-                                                setShowDateTimePicker(!showDateTimePicker);
-                                            } }
-                                        >
-                                            { dateToShortFormat(new Date(item.endTime)) }
-                                        </Text>
-                                        <Text style={ styles.grayText }> at </Text>
-                                        <Text 
-                                            style={ styles.pressableText }
-                                            onPress={ () => { 
-                                                setDateTimePickerMode('time');
-                                                setDateTimePickerValue(new Date(item.endTime));
-                                                setSelectedFastKey(item.key);
-                                                setSelectedFastProperty('endTime');
-                                                setShowDateTimePicker(!showDateTimePicker);
-                                            } }
-                                        >
-                                            { timeToShortFormat(new Date(item.endTime)) }
-                                        </Text>
+                                    <View style={ styles.secondRow }>
+                                        <View style={ styles.flexRow }>
+                                            <Text style={ styles.grayText }>Started </Text>
+                                            <Text 
+                                                style={ styles.pressableText }
+                                                onPress={ () => { 
+                                                    setDateTimePickerMode('date');
+                                                    setDateTimePickerValue(new Date(item.startTime));
+                                                    setSelectedFastKey(item.key);
+                                                    setSelectedFastProperty('startTime');
+                                                    setShowDateTimePicker(true);
+                                                } }
+                                            >
+                                                { dateToShortFormat(new Date(item.startTime)) }
+                                            </Text>
+                                            <Text style={ styles.grayText }> at </Text>
+                                            <Text 
+                                                style={ styles.pressableText }
+                                                onPress={ () => { 
+                                                    setDateTimePickerMode('time');
+                                                    setDateTimePickerValue(new Date(item.startTime));
+                                                    setSelectedFastKey(item.key);
+                                                    setSelectedFastProperty('startTime');
+                                                    setShowDateTimePicker(true);
+                                                } }
+                                            >
+                                                { timeToShortFormat(new Date(item.startTime)) }
+                                            </Text>
+                                        </View>
+                                        <View style={ styles.flexRow }>
+                                            <Text style={ styles.grayText }>Ended </Text>
+                                            <Text 
+                                                style={ styles.pressableText }
+                                                onPress={ () => { 
+                                                    setDateTimePickerMode('date');
+                                                    setDateTimePickerValue(new Date(item.endTime));
+                                                    setSelectedFastKey(item.key);
+                                                    setSelectedFastProperty('endTime');
+                                                    setShowDateTimePicker(!showDateTimePicker);
+                                                } }
+                                            >
+                                                { dateToShortFormat(new Date(item.endTime)) }
+                                            </Text>
+                                            <Text style={ styles.grayText }> at </Text>
+                                            <Text 
+                                                style={ styles.pressableText }
+                                                onPress={ () => { 
+                                                    setDateTimePickerMode('time');
+                                                    setDateTimePickerValue(new Date(item.endTime));
+                                                    setSelectedFastKey(item.key);
+                                                    setSelectedFastProperty('endTime');
+                                                    setShowDateTimePicker(!showDateTimePicker);
+                                                } }
+                                            >
+                                                { timeToShortFormat(new Date(item.endTime)) }
+                                            </Text>
+                                        </View>
                                     </View>
                                 </View>
-                            </View>
+                            </Swipeable>
                         }
                     >
                     </FlatList>
@@ -246,7 +271,18 @@ const styles = StyleSheet.create({
         borderColor: '#f0f0f0',
         borderTopWidth: 2,
     },
+    deleteButton: {
+        backgroundColor: '#ff644d',
+        justifyContent: 'center'
+    },
+    deleteButtonText: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'bold',
+        margin: 10,
+    },
     fastContainer: {
+        backgroundColor: 'white',
         borderBottomColor: '#f0f0f0',
         borderBottomWidth: 2,
         padding: 10
@@ -265,11 +301,6 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row'
     },
-    goalDuration: {
-        color: 'gray',
-        fontWeight: 'bold',
-        fontSize: 20
-    },
     grayText: {
         color: 'gray'
     },
@@ -282,6 +313,11 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         fontSize: 20,
         fontWeight: 'bold'
+    },
+    percentage: {
+        color: 'gray',
+        fontWeight: 'bold',
+        fontSize: 20
     },
     pressableText: {
         color: '#4ee7ff'
