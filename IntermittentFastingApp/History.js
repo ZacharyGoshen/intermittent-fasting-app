@@ -128,14 +128,16 @@ const History = (props) => {
                         data={ 
                             fastData.sort((a, b) => { return new Date(a.startTime) < new Date(b.startTime) }) 
                         }
-                        renderItem={ ({item}) => 
+                        renderItem={ ({item, index}) => 
                             <Swipeable 
                                 renderRightActions={ () => 
                                     <TouchableOpacity
                                         style={ styles.deleteButton }
                                         onPress={ () => { 
                                             props.onDeleteFastData(item); 
-                                            setFastData(fastData.splice(fastData.indexOf(item), 1));
+                                            const fastDataCopy = fastData.slice();
+                                            fastDataCopy.splice(index, 1);
+                                            setFastData(fastDataCopy);
                                         } }
                                     >
                                         <Text style={ styles.deleteButtonText }>Delete</Text>

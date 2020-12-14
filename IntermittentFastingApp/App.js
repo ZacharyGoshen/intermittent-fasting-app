@@ -62,16 +62,16 @@ const App = () => {
   const updateFastData = (fast) => {
     const index = fastData.indexOf(fast);
     fastData.splice(index, 1, fast);
-
     storeData('fastData', fastData);
     setFastData(fastData);
   }
 
   const deleteFastData = (fast) => {
+    const fastDataCopy = fastData.slice();
     const index = fastData.indexOf(fast);
-    fastData.splice(index, 1);
-
-    storeData('fastData', fastData);
+    fastDataCopy.splice(index, 1);
+    storeData('fastData', fastDataCopy);
+    setFastData(fastDataCopy);
   }
 
   return (
@@ -97,7 +97,9 @@ const App = () => {
           />
         ) }        
         { currentView == 'stats' && (
-          <Stats/>
+          <Stats
+            fastData={ fastData }
+          />
         ) }
         <View style={ styles.navBar }>
           <Text 
