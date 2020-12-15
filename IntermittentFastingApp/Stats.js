@@ -149,13 +149,31 @@ const Stats = (props) => {
         let longestFast = null;
         fastData.forEach(fast => {
             const fastLength = new Date(fast.endTime).getTime() - new Date(fast.startTime).getTime();
-            if (fastLength > longestFast) {
+            if (fastLength >= longestFast) {
                 longestFastLength = fastLength;
                 longestFast = fast;
             }
         });
     
         return longestFast;
+    }
+
+    const getLongestStreak = () => {
+        let longestStreak = 0;
+        let currentStreak = 0;
+        fastData.forEach(fast => {
+            const fastLength = new Date(fast.endTime).getTime() - new Date(fast.startTime).getTime();
+            const goalReached = fastLength > fast.duration;
+            if (goalReached) {
+                currentStreak += 1;
+                if (currentStreak > longestStreak) {
+                    longestStreak = currentStreak;
+                }
+            } else {
+                currentStreak = 0;
+            }
+        });
+        return longestStreak;
     }
 
     return (
@@ -170,6 +188,10 @@ const Stats = (props) => {
                             new Date(getLongestFast().endTime).getTime()
                         ) : '0:00:00'
                 }</Text>
+            </View>
+            <View style={ styles.record }>
+                <Text style={ styles.recordTitle }>Longest Streak</Text>
+                <Text style={ styles.recordValue }>{ getLongestStreak() }</Text>
             </View>
         </ScrollView>
     );
