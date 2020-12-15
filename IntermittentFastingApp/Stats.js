@@ -31,7 +31,7 @@ const Stats = (props) => {
     }
 
     const renderWeekGraph = () => {
-        const fasts = fastData.sort((a, b) => new Date(a.startTime) < new Date(b.startTime));
+        const fasts = fastData;
         const currentTime = new Date().getTime();
 
         let days = [];
@@ -317,30 +317,35 @@ const styles = StyleSheet.create({
     },
     record: {
         alignSelf: 'stretch',
-        borderBottomColor: '#f0f0f0',
-        borderBottomWidth: 2,
+        borderColor: '#f0f0f0',
+        borderRadius: 20,
+        borderWidth: 2,
+        padding: 10,
         marginLeft: 20,
-        marginRight: 20
+        marginRight: 20,
+        marginBottom: 20
     },
     recordTitle: {
         color: '#4ee7ff'
     },  
     recordValue: {
-        fontSize: 40
+        fontSize: 40,
     },
     weekGraph: {
         alignSelf: 'stretch',   
         borderColor: '#f0f0f0',
         borderRadius: 20,
         borderWidth: 2,
-        margin: 20,
+        marginBottom: 20,
+        marginLeft: 20,
+        marginRight: 20,
         padding: 20
     },
     weekGraphHeader: {
         alignItems: 'center',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 20
+        marginLeft: 20
     }
 });
 
