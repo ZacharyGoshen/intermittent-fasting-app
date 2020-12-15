@@ -103,7 +103,7 @@ const Timer = (props) => {
     const endFast = () => {
         setIsFasting(false);
         onAddFastData({
-            key: currentFastStartTime.getTime().toString(),
+            key: new Date().getTime().toString(),
             name: fastName,
             duration: fastLength,
             startTime: currentFastStartTime.toUTCString(),

@@ -149,7 +149,7 @@ const Stats = (props) => {
         let longestFast = null;
         fastData.forEach(fast => {
             const fastLength = new Date(fast.endTime).getTime() - new Date(fast.startTime).getTime();
-            if (fastLength >= longestFast) {
+            if (fastLength >= longestFastLength) {
                 longestFastLength = fastLength;
                 longestFast = fast;
             }
@@ -313,7 +313,6 @@ const styles = StyleSheet.create({
     mainContainer: {
         alignItems: 'center',
         flex: 1,
-        justifyContent: 'center'
     },
     record: {
         alignSelf: 'stretch',
@@ -345,7 +344,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginLeft: 20
+        marginBottom: 10
     }
 });
 
