@@ -20,10 +20,10 @@ export const storeData = async (key, value, callback) => {
 }
 
 export const calculateTimeDifference = (startTime, endTime) => {
-    if (startTime > endTime) {
+    if (startTime > endTime ) {
         return '0:00:00';
     }
-    
+
     let seconds = Math.round((endTime - startTime) / 1000);
 
     const hours = Math.floor(seconds / 3600);

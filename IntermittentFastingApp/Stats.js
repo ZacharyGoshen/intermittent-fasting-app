@@ -5,9 +5,8 @@ import {
     StyleSheet,
     ScrollView,
 } from 'react-native';
-import { act } from 'react-test-renderer';
 import { 
-    dateToShortFormat, 
+    calculateTimeDifference
 } from './Utils'
 
 const Stats = (props) => {
@@ -145,9 +144,33 @@ const Stats = (props) => {
         );
     }
 
+    const getLongestFast = () => {
+        let longestFastLength = 0;
+        let longestFast = null;
+        fastData.forEach(fast => {
+            const fastLength = new Date(fast.endTime).getTime() - new Date(fast.startTime).getTime();
+            if (fastLength > longestFast) {
+                longestFastLength = fastLength;
+                longestFast = fast;
+            }
+        });
+    
+        return longestFast;
+    }
+
     return (
         <ScrollView contentContainerStyle={ styles.mainContainer }>
             { renderWeekGraph() }
+            <View style={ styles.record }>
+                <Text style={ styles.recordTitle }>Longest Fast</Text>
+                <Text style={ styles.recordValue }>{
+                    fastData.length != 0 ? 
+                        calculateTimeDifference(
+                            new Date(getLongestFast().startTime).getTime(), 
+                            new Date(getLongestFast().endTime).getTime()
+                        ) : '0:00:00'
+                }</Text>
+            </View>
         </ScrollView>
     );
 }
@@ -250,6 +273,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flex: 1,
         justifyContent: 'center'
+    },
+    record: {
+        alignSelf: 'stretch',
+        borderBottomColor: '#f0f0f0',
+        borderBottomWidth: 2,
+        marginLeft: 20,
+        marginRight: 20
+    },
+    recordTitle: {
+        color: '#4ee7ff'
+    },  
+    recordValue: {
+        fontSize: 40
     },
     weekGraph: {
         alignSelf: 'stretch',   
