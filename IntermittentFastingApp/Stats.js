@@ -22,14 +22,16 @@ const Stats = (props) => {
         }
     }
 
-    const calculateDayBarInnerStyles = (goalLength, actualLength) => {
+    const calculateDayBarInnerStyles = (actualLength, goalReached) => {
         const height = dayBarMaxHeight * (actualLength / maxFastLength);
+        const backgroundColor = goalReached ? '#4ee7ff' : 'gray';
         return {
+            backgroundColor: backgroundColor,
             height: height
         };
     }
 
-    const renderDayBars = () => {
+    const renderWeekGraph = () => {
         const fasts = fastData.sort((a, b) => new Date(a.startTime) < new Date(b.startTime));
         const currentTime = new Date().getTime();
 
@@ -83,7 +85,7 @@ const Stats = (props) => {
         }
 
         let dayBars = [];
-        days.forEach(day => dayBars.push(renderDayBar(day)));
+        days.forEach((day, index) => dayBars.push(renderDayBar(day, index)));
 
         const averageHours = days.reduce((accumulator, day) => {
             return accumulator + (day.timeFasted / (7 * 60 * 60 * 1000));
@@ -94,31 +96,48 @@ const Stats = (props) => {
                 <View style={ styles.weekGraphHeader }>
                     <View>
                         <Text style={ styles.averageHoursHeader }>Average</Text>
-                        <Text style={ styles.averageHoursValue }>{ averageHours.toString().slice(0, 4) + 'h' }</Text>
+                        <Text style={ styles.averageHoursValue }>{ (Math.round(averageHours * 10) / 10) + 'h' }</Text>
                     </View>
                     <Text style={ styles.dateRange }>{ days[6].dateString + ' - ' + days[0].dateString }</Text>
                 </View>
                 <View style={ styles.dayBarsContainer }>
                     { dayBars }
+                    <View style={ styles.axisLabels }>
+                        <Text style={ styles.axisLabel }>24</Text>
+                        <Text style={ styles.axisLabel }>18</Text>
+                        <Text style={ styles.axisLabel }>12</Text>
+                        <Text style={ styles.axisLabel }>6</Text>
+                        <Text style={ styles.axisLabel }>0</Text>
+                    </View>
+                </View>
+                <View style={ styles.keys }>
+                    <View style={ styles.goalKey }></View>
+                    <Text>Goal</Text>
+                    <View style={ styles.goalReachedKey }></View>
+                    <Text>Goal Reached</Text>
+                    <View style={ styles.goalNotMetKey }></View>
+                    <Text>Goal Not Met</Text>
                 </View>
             </View>
         );
     }
 
-    const renderDayBar = (day) => {
+    const renderDayBar = (day, index) => {
         const goalFastLength = Math.min((day.timeFasted + day.timeFailed), (24 * 60 * 60 * 1000));
         const actualFastLength = day.timeFasted;
         const hours = Math.round(actualFastLength / (60 * 60 * 1000));
+        const dayBarStyles = (index == 6) ? styles.lastDayBar : styles.dayBar;
+        const goalReached = actualFastLength >= goalFastLength;
 
         return (
             <View 
                 key={ day.dateString }
-                style={ styles.dayBar }
+                style={ dayBarStyles }
             >
                 <Text style={ styles.dayBarHours }>{ hours + 'h' }</Text>
                 { ((actualFastLength > 0) || (goalFastLength > 0)) && (
                     <View style={ [styles.dayBarOuter, calculateDayBarOuterStyles(goalFastLength)] }>
-                        <View style={ [styles.dayBarInner, calculateDayBarInnerStyles(goalFastLength, actualFastLength)] }></View>
+                        <View style={ [styles.dayBarInner, calculateDayBarInnerStyles(actualFastLength, goalReached)] }></View>
                     </View>
                 ) }
                 <Text style={ styles.dayBarDate }>{ day.dateString }</Text>
@@ -128,7 +147,7 @@ const Stats = (props) => {
 
     return (
         <ScrollView contentContainerStyle={ styles.mainContainer }>
-            { renderDayBars() }
+            { renderWeekGraph() }
         </ScrollView>
     );
 }
@@ -141,36 +160,91 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold'
     },
+    axisLabel: {
+        color: 'gray',
+        fontSize: 10,
+    }, 
+    axisLabels: {
+        height: 282,
+        justifyContent: 'space-between',
+        paddingBottom: 42,
+        paddingTop: 40
+    },
     dateRange: {
         fontWeight: 'bold'
     },
     dayBar: {
-        alignItems: 'center'
+        alignSelf: 'stretch',
+        alignItems: 'center',
+        borderLeftColor: '#f0f0f0',
+        borderLeftWidth: 2,
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
+        paddingLeft: 5,
+        paddingRight: 5
     },  
     dayBarDate: {
-        fontSize: 12,
-        marginTop: 20
+        fontSize: 10,
+        marginBottom: 10,
+        marginTop: 20,
     },
     dayBarHours: {
         color: 'gray',
-        fontSize: 12
+        fontSize: 10
     },
     dayBarInner: {
-        backgroundColor: '#4ee7ff',
         borderRadius: 5,
         width: 10
     },
     dayBarOuter: {
-        backgroundColor: 'gray',
+        backgroundColor: '#f0f0f0',
         borderRadius: 5,
         height: 200,
         justifyContent: 'flex-end',
-        marginTop: 20
+        marginTop: 20,
+        width: 10
     },
     dayBarsContainer: {
         alignItems: 'flex-end',
         flexDirection: 'row-reverse',
-        justifyContent: 'space-evenly'
+        justifyContent: 'center'
+    },
+    goalKey: {
+        backgroundColor: '#f0f0f0',
+        borderRadius: 20,
+        height: 20,
+        marginRight: 5,
+        width: 20
+    },
+    goalNotMetKey: {
+        backgroundColor: 'gray',
+        borderRadius: 20,
+        height: 20,
+        marginLeft: 10,
+        marginRight: 5,
+        width: 20
+    },
+    goalReachedKey: {
+        backgroundColor: '#4ee7ff',
+        borderRadius: 20,
+        height: 20,
+        marginLeft: 10,
+        marginRight: 5,
+        width: 20
+    },
+    keys: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 20
+    },
+    lastDayBar: {
+        alignSelf: 'stretch',
+        alignItems: 'center',
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
+        paddingLeft: 5,
+        paddingRight: 5
     },
     mainContainer: {
         alignItems: 'center',
