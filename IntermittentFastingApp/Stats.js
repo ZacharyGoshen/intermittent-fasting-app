@@ -176,6 +176,21 @@ const Stats = (props) => {
         return longestStreak;
     }
 
+    const getCurrentStreak = () => {
+        let currentStreak = 0;
+        for (let i = 0; i < fastData.length; i++) {
+            const fast = fastData[i];
+            const fastLength = new Date(fast.endTime).getTime() - new Date(fast.startTime).getTime();
+            const goalReached = fastLength > fast.duration;
+            if (goalReached) {
+                currentStreak += 1;
+            } else {
+                break;
+            }
+        }
+        return currentStreak;
+    }
+
     return (
         <ScrollView contentContainerStyle={ styles.mainContainer }>
             { renderWeekGraph() }
@@ -190,8 +205,12 @@ const Stats = (props) => {
                 }</Text>
             </View>
             <View style={ styles.record }>
-                <Text style={ styles.recordTitle }>Longest Streak</Text>
+                <Text style={ styles.recordTitle }>Longest Streak (Fasts Completed)</Text>
                 <Text style={ styles.recordValue }>{ getLongestStreak() }</Text>
+            </View>
+            <View style={ styles.record }>
+                <Text style={ styles.recordTitle }>Current Streak (Fasts Completed)</Text>
+                <Text style={ styles.recordValue }>{ getCurrentStreak() }</Text>
             </View>
         </ScrollView>
     );

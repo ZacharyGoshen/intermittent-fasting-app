@@ -55,8 +55,10 @@ const App = () => {
   }
 
   const addFastData = (fast) => {
+    setFastData([...fastData, fast].sort((a, b) => { 
+      return new Date(a.startTime) < new Date(b.startTime)
+    }));
     storeData('fastData', [...fastData, fast]);
-    setFastData([...fastData, fast]);
   }
 
   const updateFastData = (fast) => {

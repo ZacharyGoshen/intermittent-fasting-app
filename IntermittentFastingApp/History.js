@@ -125,9 +125,7 @@ const History = (props) => {
                 ) }
                 { fastData.length > 0 && (
                     <FlatList
-                        data={ 
-                            fastData.sort((a, b) => { return new Date(a.startTime) < new Date(b.startTime) }) 
-                        }
+                        data={ fastData }
                         renderItem={ ({item, index}) => 
                             <Swipeable 
                                 renderRightActions={ () => 
