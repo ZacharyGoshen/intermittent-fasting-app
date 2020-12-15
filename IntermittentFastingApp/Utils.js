@@ -47,12 +47,15 @@ export const dateToShortFormat = (date) => {
     } else if (date.getDate() == tomorrow.getDate()) {
         return 'Tomorrow';
     } else {
-        const month = new Intl.DateTimeFormat('en', { month: 'short' }).format(date);
-        const day = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(date);
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const month = months[date.getMonth()];
+        const day = date.getDate();
         return `${month} ${day}`;
     }
 }
 
 export const timeToShortFormat = (time) => {
-    return new Intl.DateTimeFormat('en', { hour: 'numeric', minute: '2-digit' }).format(time);
+    const hour = time.getHours();
+    const minute = time.getMinutes();
+    return `${hour}:${minute}`;
 }

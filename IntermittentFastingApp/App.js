@@ -15,7 +15,7 @@ const App = () => {
   const [currentView, setCurrentView] = useState('timer');
   const [fastData, setFastData] = useState([]);
   const [fastName, setFastName] = useState('16:8 Intermittent');
-  const [fastLength, setFastLength] = useState(8 * 60 * 60 * 1000);
+  const [fastLength, setFastLength] = useState(16 * 60 * 60 * 1000);
 
   useEffect(() => {
     getData('fastData').then(result => {
@@ -27,11 +27,19 @@ const App = () => {
     });
 
     getData('fastName').then(result => {
-      setFastName(result);
+      if (result) {
+        setFastName(result);
+      } else {
+        storeData('fastName', '16:8 Intermittent');
+      }
     });
 
     getData('fastLength').then(result => {
-      setFastLength(result);
+      if (result) {
+        setFastLength(parseInt(result));
+      } else {
+        storeData('fastLength', (16 * 60 * 60 * 1000));
+      }
     });
   }, []);
 
@@ -58,7 +66,9 @@ const App = () => {
     setFastData([...fastData, fast].sort((a, b) => { 
       return new Date(a.startTime) < new Date(b.startTime)
     }));
-    storeData('fastData', [...fastData, fast]);
+    storeData('fastData', [...fastData, fast].sort((a, b) => { 
+      return new Date(a.startTime) < new Date(b.startTime)
+    }));
   }
 
   const updateFastData = (fast) => {

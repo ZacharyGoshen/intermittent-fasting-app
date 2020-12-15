@@ -6,7 +6,8 @@ import {
     ScrollView,
 } from 'react-native';
 import { 
-    calculateTimeDifference
+    calculateTimeDifference,
+    dateToShortFormat
 } from './Utils'
 
 const Stats = (props) => {
@@ -40,7 +41,7 @@ const Stats = (props) => {
 
             const dayStartTime = new Date(currentTime - offset).setHours(0, 0, 0, 0);
             const dayEndTime = dayStartTime + (24 * 60 * 60 * 1000) - 1;
-            const dateString = new Intl.DateTimeFormat('en', { month: 'short', day: '2-digit' }).format(new Date(dayStartTime));
+            const dateString = dateToShortFormat(new Date(dayStartTime));
 
             let timeFasted = 0;
             let timeFailed = 0;
